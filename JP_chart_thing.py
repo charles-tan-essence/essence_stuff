@@ -70,4 +70,14 @@ plt.title('Normalized Overall Sales vs Date')
 plt.show()
 
 
+print('---------------')
+print('Sheet 20 length:', len(df1), 'Sheet 22 length:', len(df2))
 
+##############
+# just do a simple correlation
+
+merged = pd.merge_asof(df1, df2, left_index=True, right_index=True, direction='nearest')
+
+print('Merged sheet length:', len(merged))
+
+print(merged.corr())
