@@ -28,4 +28,12 @@ class SheetManager():
             return(pd.DataFrame(values[1:], columns=values[0]))
         else:
             return(values)
-        
+    
+    def update_values(self, sheetId, update_range, values):
+        resource = self.resource.values()
+        request = resource.update(spreadsheetId=sheetId,
+                                  range=update_range,
+                                  body={'values': values},
+                                  valueInputOption='USER_ENTERED')
+        response = request.execute()
+        return(response)
