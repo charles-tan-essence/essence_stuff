@@ -29,14 +29,6 @@ sheetManager = SheetManager(creds)
 
 df = sheetManager.get_values(sheetId=sheetId, data_range=data_range)
 df = df.sort_values(['Question', 'Attribute', 'Cut', 'Answer'])
-#df.to_csv('raw.csv', encoding='utf_8_sig', index=False)
-#print(df.columns)
-
-#df.loc[:, 'Significance'] = 'No Lift'
-#df.loc[df['Min_Abs_Lift_80'] > 0, 'Significance'] = 'Directional Lift'
-#df.loc[df['Min_Abs_Lift_90'] > 0, 'Significance'] = 'Significant Lift'
-#df.loc[df['Min_Abs_Lift_95'] > 0, 'Significance'] = 'Strong Significant Lift'
-#df.loc[df['Answer'] != 'Desired', 'Answer'] = df['Answer'].str.cat(df['AnswerValue'], sep=': ')
 df.loc[:, 'Abs_Lift'] = df.loc[:,'Conv_Exp'] - df.loc[:, 'Conv_Con']
 df.loc[:, '%'] = '%'
 
@@ -50,7 +42,18 @@ df.loc[:, 'Summary'] = df.loc[:, 'Significance'].str.cat(make_percent(df.loc[:, 
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Con'], 2), sep='\n')
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Exp'], 2), sep=' - ')
 
-df.loc[df['Attribute'] == 'MAP QUESTION_3_0'].to_csv('results.csv', encoding='utf_8_sig')
+#questions = df['QuestionTitle'].unique().tolist()
+#answers = df['Answer'].unique().tolist()
+#col_index = pd.MultiIndex.from_product([questions, answers])
+#
+#attributes = df['Attribute'].unique().tolist()
+#cuts = df['Cut'].unique().tolist()
+#row_index = pd.MultiIndex.from_product([attributes, cuts])
+#df = pd.DataFrame(df, index=row_index, columns=col_index)
+#
+#df.to_csv('results.csv', encoding='utf_8_sig')
+
+
 #test = df.copy()
 #test.to_csv('results.csv', encoding='utf_8_sig')
 
@@ -133,6 +136,6 @@ if append == 'test':
 
 
 
-#sheetManager.update_values(sheetId=sheetId,
-#                           update_range=results_range,
-#                           values=values)
+sheetManager.update_values(sheetId=sheetId,
+                           update_range=results_range,
+                           values=values)
