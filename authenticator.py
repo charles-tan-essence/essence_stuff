@@ -7,6 +7,8 @@ Created on Wed Sep 11 16:19:38 2019
 
 '''
 Create a class to handle authentication
+1. Read in your keys (json) when you create the authenticator
+2. Get your creds (using get_creds) that you can then use!
 '''
 
 import pickle
