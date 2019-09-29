@@ -1,0 +1,6 @@
+_pycache_/
+_pycache_\
+
+*.csv
+*.pickle
+*.json
