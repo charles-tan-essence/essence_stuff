@@ -42,6 +42,39 @@ df.loc[:, 'Summary'] = df.loc[:, 'Significance'].str.cat(make_percent(df.loc[:, 
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Con'], 2), sep='\n')
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Exp'], 2), sep=' - ')
 
+questions = df.groupby(['Question', 'QuestionTitle', 'Answer'])['AnswerValue'].last()
+
+questions = questions.reset_index()
+
+values = []
+questions_row = []
+answers_row = []
+# handle questions row
+for question in questions['QuestionTitle'].unique():
+    gaps = len(questions.loc[questions['QuestionTitle'] == question, 'Answer'].unique())-1
+    questions_row.append(question)
+    for gap in range(gaps):
+        questions_row.append('')
+    answers = questions.loc[questions['QuestionTitle'] == question, 'Answer'].str.cat(questions.loc[questions['QuestionTitle'] == question, 'AnswerValue'], sep=': ')
+    for answer in answers:
+        answers_row.append(answer)
+
+values.append(questions_row)
+values.append(answers_row)
+import csv
+with open('preview.csv', 'w', encoding='utf-8-sig', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    for row in values:
+        writer.writerow(row)
+
+#questions.to_csv('questions.csv', encoding='utf_8_sig')
+
+#for x in questions.index:
+#    print(x)
+
+#print(df.loc[df['Answer'] == 'Desired', 'AnswerValue'].unique())
+
+
 #questions = df['QuestionTitle'].unique().tolist()
 #answers = df['Answer'].unique().tolist()
 #col_index = pd.MultiIndex.from_product([questions, answers])
@@ -136,6 +169,6 @@ if append == 'test':
 
 
 
-sheetManager.update_values(sheetId=sheetId,
-                           update_range=results_range,
-                           values=values)
+#sheetManager.update_values(sheetId=sheetId,
+#                           update_range=results_range,
+#                           values=values)
