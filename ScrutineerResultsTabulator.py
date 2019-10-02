@@ -42,15 +42,18 @@ df.loc[:, 'Summary'] = df.loc[:, 'Significance'].str.cat(make_percent(df.loc[:, 
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Con'], 2), sep='\n')
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Exp'], 2), sep=' - ')
 
-
 # create "header" area
 questions = df.groupby(['Question', 'QuestionTitle', 'Answer'])['AnswerValue'].last()
 
 questions = questions.reset_index()
 
 values = []
+buffer_size = 2 # so there is room for the attribute and cuts columns
 questions_row = []
 answers_row = []
+for x in range(buffer_size):
+    questions_row.append('')
+    answers_row.append('')
 
 for question in questions['QuestionTitle'].unique():
     gaps = len(questions.loc[questions['QuestionTitle'] == question, 'Answer'].unique())-1
@@ -63,6 +66,31 @@ for question in questions['QuestionTitle'].unique():
 
 values.append(questions_row)
 values.append(answers_row)
+
+# leave one row for the array formula
+len_of_header = len(answers_row)
+len_of_array_formula_row = len_of_header - buffer_size
+array_formula_row = []
+for x in range(buffer_size):
+    array_formula_row.append('')
+for cell in range(len_of_array_formula_row):
+    array_formula_row.append('=concatenate("Placeholder for array formula. Attribute is: ", ADDRESS(ROW(),1, 3))')
+    
+values.append(array_formula_row)
+    
+
+# create the attribute and cut columns
+cuts = df.groupby(['Attribute', 'Cut'])['Significance'].last().reset_index()
+for row in cuts[['Attribute', 'Cut']].values.tolist():
+    pair = []
+    for item in row:
+        pair.append(item)
+    values.append(pair)
+    
+for row in values:
+    print(row)
+
+
 
 #import csv
 #with open('preview.csv', 'w', encoding='utf-8-sig', newline='') as csvfile:
