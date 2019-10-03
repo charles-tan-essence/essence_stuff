@@ -49,7 +49,7 @@ lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['QuestionTitle'], s
 lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['Answer'], sep='|')
 lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['AnswerValue'], sep=': ')
 
-lookup_df = lookup_df[['identifier', 'Significance']]
+lookup_df = lookup_df[['identifier', 'Significance', 'Summary']]
 lookup_values = []
 lookup_values.append(lookup_df.columns.to_list())
 for row in lookup_df.values.tolist():
@@ -68,11 +68,16 @@ values = []
 buffer_size = 2 # so there is room for the attribute and cuts columns
 questions_row = []
 answers_row = []
+code_no_lift_row =['Codes:', 'Code No Lift']
+code_lift_row = ['Significance: 2\nAbs Lift: 3', 'Code Lift']
+metric_row = []
 for x in range(buffer_size):
     questions_row.append('')
     answers_row.append('')
+    metric_row.append('')
 
 for question in questions['QuestionTitle'].unique():
+    metric = df.loc[df['QuestionTitle'] == question, 'QuestionCategory'].unique()[0]
     gaps = len(questions.loc[questions['QuestionTitle'] == question, 'Answer'].unique())-1
     questions_row.append(question)
     for gap in range(gaps):
@@ -81,13 +86,15 @@ for question in questions['QuestionTitle'].unique():
     answers = questions.loc[questions['QuestionTitle'] == question, 'Answer'].str.cat(questions.loc[questions['QuestionTitle'] == question, 'AnswerValue'], sep=': ')
     for answer in answers:
         answers_row.append(answer)
+        code_no_lift_row.append(2)
+        code_lift_row.append(2)
+        metric_row.append(metric)
 
-
-"""
-=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, 2, false)
-"""
 values.append(questions_row)
 values.append(answers_row)
+values.append(code_no_lift_row)
+values.append(code_lift_row)
+values.append(metric_row)
 
 # leave one row for the array formula
 len_of_header = len(answers_row)
@@ -98,7 +105,7 @@ for x in range(buffer_size):
 for cell in range(len_of_array_formula_row):
     array_formula_row.append('=concatenate("Placeholder for array formula. Attribute is: ", ADDRESS(ROW(),1, 3))')
     
-values.append(array_formula_row)
+#values.append(array_formula_row)
     
 
 formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, 2, false)'
