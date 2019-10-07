@@ -121,21 +121,6 @@ for row in cuts[['Attribute', 'Cut']].values.tolist():
     values.append(pair)
 
 
-
-#import csv
-#with open('preview.csv', 'w', encoding='utf-8-sig', newline='') as csvfile:
-#    writer = csv.writer(csvfile)
-#    for row in values:
-#        writer.writerow(row)
-
-
 sheetManager.update_values(sheetId=sheetId,
                            update_range=results_range,
                            values=values)
-
-#check = sheetManager.get_values(sheetId=sheetId,
-#                                data_range=results_range,
-#                                as_df=False)
-#
-#for row in check:
-#    print(row)
