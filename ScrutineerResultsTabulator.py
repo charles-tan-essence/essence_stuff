@@ -68,8 +68,8 @@ values = []
 buffer_size = 2 # so there is room for the attribute and cuts columns
 questions_row = []
 answers_row = []
-code_no_lift_row =['Codes:', 'Code No Lift']
-code_lift_row = ['Significance: 2\nAbs Lift: 3', 'Code Lift']
+#code_no_lift_row =['Codes:', 'Code No Lift']
+#code_lift_row = ['Significance: 2\nAbs Lift: 3', 'Code Lift']
 metric_row = []
 for x in range(buffer_size):
     questions_row.append('')
@@ -86,14 +86,14 @@ for question in questions['QuestionTitle'].unique():
     answers = questions.loc[questions['QuestionTitle'] == question, 'Answer'].str.cat(questions.loc[questions['QuestionTitle'] == question, 'AnswerValue'], sep=': ')
     for answer in answers:
         answers_row.append(answer)
-        code_no_lift_row.append(2)
-        code_lift_row.append(2)
+#        code_no_lift_row.append(2)
+#        code_lift_row.append(2)
         metric_row.append(metric)
 
 values.append(questions_row)
 values.append(answers_row)
-values.append(code_no_lift_row)
-values.append(code_lift_row)
+#values.append(code_no_lift_row)
+#values.append(code_lift_row)
 values.append(metric_row)
 
 # leave one row for the array formula
@@ -107,8 +107,8 @@ for cell in range(len_of_array_formula_row):
     
 #values.append(array_formula_row)
     
-
-formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, 2, false)'
+lookup_col = 3
+formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(lookup_col)+', false)'
 
 # create the attribute and cut columns
 cuts = df.groupby(['Attribute', 'Cut'])['Significance'].last().reset_index()
@@ -132,3 +132,10 @@ for row in cuts[['Attribute', 'Cut']].values.tolist():
 sheetManager.update_values(sheetId=sheetId,
                            update_range=results_range,
                            values=values)
+
+#check = sheetManager.get_values(sheetId=sheetId,
+#                                data_range=results_range,
+#                                as_df=False)
+#
+#for row in check:
+#    print(row)
