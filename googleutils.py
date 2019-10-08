@@ -5,7 +5,7 @@ Created on Mon Oct  7 17:46:16 2019
 @author: charles.tan
 """
 '''
-Create a class to handle authentication
+script to contain Google-related classes
 '''
 
 import pickle
