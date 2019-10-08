@@ -8,11 +8,11 @@ Created on Tue Sep 24 16:03:31 2019
 sheetId = '1rlc8Wltr15SCLie4QrbiZjNQXSkD7l19dbBixdhTuCg'
 
 data_range = 'Results'
+lookup_range = 'ScrutineerLookup'
 results_range = 'Results2'
 #sheetId = '1SohobNnQDLN1T95Wl3jMD0QEgV7VgPlX-3pZH43rcE4'
 #data_range ='results-20190913-110925'
 #results_range ='test'
-append = None # 'vertical' or 'horizontal'
 
 from authenticator import Authenticator
 from sheetmanager import SheetManager
@@ -42,98 +42,83 @@ df.loc[:, 'Summary'] = df.loc[:, 'Significance'].str.cat(make_percent(df.loc[:, 
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Con'], 2), sep='\n')
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Exp'], 2), sep=' - ')
 
-#questions = df['QuestionTitle'].unique().tolist()
-#answers = df['Answer'].unique().tolist()
-#col_index = pd.MultiIndex.from_product([questions, answers])
-#
-#attributes = df['Attribute'].unique().tolist()
-#cuts = df['Cut'].unique().tolist()
-#row_index = pd.MultiIndex.from_product([attributes, cuts])
-#df = pd.DataFrame(df, index=row_index, columns=col_index)
-#
-#df.to_csv('results.csv', encoding='utf_8_sig')
+# create lookup table
+lookup_df = df.copy()
+lookup_df['identifier'] = df['Attribute'].str.cat(df['Cut'], sep='|')
+lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['QuestionTitle'], sep='|')
+lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['Answer'], sep='|')
+lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['AnswerValue'], sep=': ')
 
-
-#test = df.copy()
-#test.to_csv('results.csv', encoding='utf_8_sig')
-
-if append == 'horizontal':
-    df = df.groupby(['Attribute', 'Cut', 'QuestionTitle', 'Answer'])['Summary'].last().unstack('QuestionTitle').unstack('Answer').reset_index()
-    df = df.fillna('')
-    df.columns.to_flat_index()
-    df.to_csv('temp.csv', index=False, encoding='utf_8_sig')
-#     time to do some disgusting roundabout way...
-    import os
-    import csv
-    values = []
-    with open('temp.csv', 'r', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            values.append(row)
-    os.remove('temp.csv')
-
-
-if append == 'vertical':
-
-    df = df[['Attribute', 'Cut', 'Question', 'QuestionTitle', 'QuestionCategory', 'Answer', 'AnswerValue', 'Conv_Con', 'Conv_Exp', 'Abs_Lift', 'Significance', 'Summary']]
-    df = df.sort_values(by=['Question', 'Attribute', 'Cut', 'Answer'])
+lookup_df = lookup_df[['identifier', 'Significance', 'Summary']]
+lookup_values = []
+lookup_values.append(lookup_df.columns.to_list())
+for row in lookup_df.values.tolist():
+    lookup_values.append(row)
     
-    
-    df2 = df.set_index(['QuestionTitle', 'Attribute', 'Cut', 'Answer'])['Summary'].unstack().reset_index()
-    
-    #df2.to_csv('results.csv', encoding='utf_8_sig', index=False)
-    
-    df_values = df2.fillna('').values
-    
-    values = []
-    answers_added = []
-    completed_questions = []
-    
-    def get_max_num_of_ans_options():
-        for_comparison = []
-        for question in df2['QuestionTitle'].unique():
-            for_comparison.append(len(df.loc[df['QuestionTitle'] == question, 'Answer'].unique()))
-        return(max(for_comparison))
-        
-    completed_cuts = []
-    row_values = []
-    for row in df_values:
-        if row[0] not in completed_questions:
-            heading_row = ['', '', row[df2.columns.get_loc('QuestionTitle')]]
-            values.append(heading_row)
-    #        answer_list = df.loc[df['Question'] == row[df.columns.get_loc('Question')], 'Answer'].unique()
-            answer_row = ['', '']
-            answer_list = [i+1 for i in range(get_max_num_of_ans_options()-1)]
-            answer_row.extend(answer_list)
-            answer_row.append('Desired')
-            values.append(answer_row)        
-            completed_questions.append(row[df2.columns.get_loc('QuestionTitle')])
-        row_values = []
-        for i in row[1:]:
-            row_values.append(i)
-        values.append(row_values)
+sheetManager.update_values(sheetId=sheetId,
+                           update_range=lookup_range,
+                           values=lookup_values)
 
-if append == 'test':
-    df = df.groupby(['Attribute', 'Cut', 'QuestionTitle', 'Answer'])['Summary'].last().unstack('QuestionTitle').unstack('Answer').reset_index()
-    # currently attribute and cut are considered as part of this level
-    # we will need to remove them
-    questions = df.columns.get_level_values('QuestionTitle').unique().tolist()
-    questions.remove('Attribute')
-    questions.remove('Cut')
-    import csv
-    import os
-    values = []
-    for question in questions:
-        df_out = df[['Attribute', 'Cut', question]]
-        df_out = df_out.fillna('')
-        df_out.to_csv('temp.csv', encoding='utf_8_sig', index=False)
-        with open('temp.csv', 'r', encoding='utf-8') as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                values.append(row)
-        os.remove('temp.csv')
-    
+# create "header" area
+questions = df.groupby(['Question', 'QuestionTitle', 'Answer'])['AnswerValue'].last()
 
+questions = questions.reset_index()
+
+values = []
+buffer_size = 2 # so there is room for the attribute and cuts columns
+questions_row = []
+answers_row = []
+#code_no_lift_row =['Codes:', 'Code No Lift']
+#code_lift_row = ['Significance: 2\nAbs Lift: 3', 'Code Lift']
+metric_row = []
+for x in range(buffer_size):
+    questions_row.append('')
+    answers_row.append('')
+    metric_row.append('')
+
+for question in questions['QuestionTitle'].unique():
+    metric = df.loc[df['QuestionTitle'] == question, 'QuestionCategory'].unique()[0]
+    gaps = len(questions.loc[questions['QuestionTitle'] == question, 'Answer'].unique())-1
+    questions_row.append(question)
+    for gap in range(gaps):
+#        questions_row.append('')
+        questions_row.append(question)
+    answers = questions.loc[questions['QuestionTitle'] == question, 'Answer'].str.cat(questions.loc[questions['QuestionTitle'] == question, 'AnswerValue'], sep=': ')
+    for answer in answers:
+        answers_row.append(answer)
+#        code_no_lift_row.append(2)
+#        code_lift_row.append(2)
+        metric_row.append(metric)
+
+values.append(questions_row)
+values.append(answers_row)
+#values.append(code_no_lift_row)
+#values.append(code_lift_row)
+values.append(metric_row)
+
+# leave one row for the array formula
+len_of_header = len(answers_row)
+len_of_array_formula_row = len_of_header - buffer_size
+array_formula_row = []
+for x in range(buffer_size):
+    array_formula_row.append('')
+for cell in range(len_of_array_formula_row):
+    array_formula_row.append('=concatenate("Placeholder for array formula. Attribute is: ", ADDRESS(ROW(),1, 3))')
+    
+#values.append(array_formula_row)
+    
+lookup_col = 3
+formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(lookup_col)+', false)'
+
+# create the attribute and cut columns
+cuts = df.groupby(['Attribute', 'Cut'])['Significance'].last().reset_index()
+for row in cuts[['Attribute', 'Cut']].values.tolist():
+    pair = []
+    for item in row:
+        pair.append(item)
+    for x in range(len_of_array_formula_row):
+        pair.append(formula)
+    values.append(pair)
 
 
 sheetManager.update_values(sheetId=sheetId,
