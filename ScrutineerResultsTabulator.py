@@ -42,6 +42,8 @@ df.loc[:, 'Summary'] = df.loc[:, 'Significance'].str.cat(make_percent(df.loc[:, 
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Con'], 2), sep='\n')
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Exp'], 2), sep=' - ')
 
+df.to_csv('test.csv')
+
 # create lookup table
 lookup_df = df.copy()
 lookup_df['identifier'] = df['Attribute'].str.cat(df['Cut'], sep='|')
@@ -49,15 +51,15 @@ lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['QuestionTitle'], s
 lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['Answer'], sep='|')
 lookup_df['identifier'] = lookup_df['identifier'].str.cat(df['AnswerValue'], sep=': ')
 
-lookup_df = lookup_df[['identifier', 'Significance', 'Summary']]
+lookup_df = lookup_df[['identifier', 'Significance', 'Summary', 'Conv_Con', 'Abs_Lift']]
 lookup_values = []
 lookup_values.append(lookup_df.columns.to_list())
 for row in lookup_df.values.tolist():
     lookup_values.append(row)
     
-sheetManager.update_values(sheetId=sheetId,
-                           update_range=lookup_range,
-                           values=lookup_values)
+#sheetManager.update_values(sheetId=sheetId,
+#                           update_range=lookup_range,
+#                           values=lookup_values)
 
 # create "header" area
 questions = df.groupby(['Question', 'QuestionTitle', 'Answer'])['AnswerValue'].last()
@@ -68,8 +70,6 @@ values = []
 buffer_size = 2 # so there is room for the attribute and cuts columns
 questions_row = []
 answers_row = []
-#code_no_lift_row =['Codes:', 'Code No Lift']
-#code_lift_row = ['Significance: 2\nAbs Lift: 3', 'Code Lift']
 metric_row = []
 for x in range(buffer_size):
     questions_row.append('')
@@ -92,8 +92,6 @@ for question in questions['QuestionTitle'].unique():
 
 values.append(questions_row)
 values.append(answers_row)
-#values.append(code_no_lift_row)
-#values.append(code_lift_row)
 values.append(metric_row)
 
 # leave one row for the array formula
@@ -107,8 +105,9 @@ for cell in range(len_of_array_formula_row):
     
 #values.append(array_formula_row)
     
-lookup_col = 3
-formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(lookup_col)+', false)'
+summary_col = lookup_df.columns.get_loc('Summary') + 1
+#results_formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(summary_col)+', false)'
+results_formula = 'Results Placeholder'
 
 # create the attribute and cut columns
 cuts = df.groupby(['Attribute', 'Cut'])['Significance'].last().reset_index()
@@ -116,11 +115,22 @@ for row in cuts[['Attribute', 'Cut']].values.tolist():
     pair = []
     for item in row:
         pair.append(item)
-    for x in range(len_of_array_formula_row):
-        pair.append(formula)
     values.append(pair)
+    baselines = ['', 'Baseline']
+    for x in range(len_of_array_formula_row):
+        baselines.append('Baseline Placeholder')
+    values.append(baselines)
+    results = ['', '']
+    for x in range(len_of_array_formula_row):
+        results.append(results_formula)
+    values.append(results)
 
+import csv
+with open('test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+    writer = csv.writer(csvfile)
+    for row in values:
+        writer.writerow(row)
 
-sheetManager.update_values(sheetId=sheetId,
-                           update_range=results_range,
-                           values=values)
+#sheetManager.update_values(sheetId=sheetId,
+#                           update_range=results_range,
+#                           values=values)
