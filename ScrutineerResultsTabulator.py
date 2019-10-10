@@ -42,7 +42,7 @@ df.loc[:, 'Summary'] = df.loc[:, 'Significance'].str.cat(make_percent(df.loc[:, 
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Con'], 2), sep='\n')
 df.loc[:, 'Summary'] = df.loc[:, 'Summary'].str.cat(make_percent(df.loc[:, 'Conv_Exp'], 2), sep=' - ')
 
-df.to_csv('test.csv')
+#df.to_csv('test.csv')
 
 # create lookup table
 lookup_df = df.copy()
@@ -108,19 +108,24 @@ for cell in range(len_of_array_formula_row):
 summary_col = lookup_df.columns.get_loc('Summary') + 1
 #results_formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(summary_col)+', false)'
 results_formula = '=CONCATENATE(INDIRECT(ADDRESS(ROW()-2,1,1,1)),"|",INDIRECT(ADDRESS(ROW()-2,2,1,1)),"|",INDIRECT(ADDRESS(1,COLUMN(),1,1)),"|",INDIRECT(ADDRESS(2,COLUMN(),1,1)))'
+sample_size_formula = 'Sample Size Placeholder'
 
+# MAIN BODY
 # create the attribute and cut columns
 cuts = df.groupby(['Attribute', 'Cut'])['Significance'].last().reset_index()
 for row in cuts[['Attribute', 'Cut']].values.tolist():
+    # create a row for each attribute/cut pair
     pair = []
     for item in row:
         pair.append(item)
     values.append(pair)
+    # create a row for the baselines
     baselines = ['', 'Baseline']
     for x in range(len_of_array_formula_row):
         baselines.append('Baseline Placeholder')
     values.append(baselines)
-    results = ['', '']
+    # create a row for the results, with sample size in front
+    results = ['Sample Size:', sample_size_formula]
     for x in range(len_of_array_formula_row):
         results.append(results_formula)
     values.append(results)
