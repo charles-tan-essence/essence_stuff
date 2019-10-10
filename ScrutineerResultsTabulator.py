@@ -3,6 +3,14 @@
 Created on Tue Sep 24 16:03:31 2019
 
 @author: charles.tan
+
+format to create requests and execute them:
+https://developers.google.com/sheets/api/guides/batchupdate#example
+sample recipes:
+https://developers.google.com/sheets/api/samples/reading
+more documentation of potential requests:
+https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request
+
 """
 
 sheetId = '1rlc8Wltr15SCLie4QrbiZjNQXSkD7l19dbBixdhTuCg'
