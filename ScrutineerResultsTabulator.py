@@ -107,7 +107,7 @@ for cell in range(len_of_array_formula_row):
     
 summary_col = lookup_df.columns.get_loc('Summary') + 1
 #results_formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(summary_col)+', false)'
-results_formula = 'Results Placeholder'
+results_formula = '=CONCATENATE(INDIRECT(ADDRESS(ROW()-2,1,1,1)),"|",INDIRECT(ADDRESS(ROW()-2,2,1,1)),"|",INDIRECT(ADDRESS(1,COLUMN(),1,1)),"|",INDIRECT(ADDRESS(2,COLUMN(),1,1)))'
 
 # create the attribute and cut columns
 cuts = df.groupby(['Attribute', 'Cut'])['Significance'].last().reset_index()
