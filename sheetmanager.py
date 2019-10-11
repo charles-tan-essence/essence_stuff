@@ -13,9 +13,9 @@ class SheetManager():
         self.creds = creds
         self.resource = build('sheets', 'v4', credentials=creds).spreadsheets()
         
-    def get_values(self, sheetId, data_range, as_df = True):
+    def get_values(self, spreadsheetId, data_range, as_df = True):
         resource = self.resource.values()
-        request = resource.get(spreadsheetId=sheetId, range=data_range,
+        request = resource.get(spreadsheetId=spreadsheetId, range=data_range,
                                valueRenderOption='UNFORMATTED_VALUE')
         response = request.execute()
         values = response['values']
@@ -29,11 +29,21 @@ class SheetManager():
         else:
             return(values)
     
-    def update_values(self, sheetId, update_range, values):
+    def update_values(self, spreadsheetId, update_range, values):
         resource = self.resource.values()
-        request = resource.update(spreadsheetId=sheetId,
+        request = resource.update(spreadsheetId=spreadsheetId,
                                   range=update_range,
                                   body={'values': values},
                                   valueInputOption='USER_ENTERED')
         response = request.execute()
         return(response)
+        
+    def batch_update(self, spreadsheetId, body):
+        resource = self.resource.batchUpdate(spreadsheetId=spreadsheetId,
+                                             body=body)
+        resource.execute()
+        
+    def get(self, spreadsheetId, ranges=None):
+        resource = self.resource.get(spreadsheetId=spreadsheetId,
+                                     ranges=ranges)
+        return(resource.execute())

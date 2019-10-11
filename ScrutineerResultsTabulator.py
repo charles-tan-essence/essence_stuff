@@ -13,7 +13,7 @@ https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request
 
 """
 
-sheetId = '1rlc8Wltr15SCLie4QrbiZjNQXSkD7l19dbBixdhTuCg'
+spreadsheetId = '1rlc8Wltr15SCLie4QrbiZjNQXSkD7l19dbBixdhTuCg'
 
 data_range = 'Results'
 lookup_range = 'ScrutineerLookup'
@@ -35,7 +35,7 @@ creds = authenticator.get_creds(SCOPES)
 sheetManager = SheetManager(creds)
 
 # get Scrutineer Results
-df = sheetManager.get_values(sheetId=sheetId, data_range=data_range)
+df = sheetManager.get_values(spreadsheetId=spreadsheetId, data_range=data_range)
 df = df.sort_values(['Question', 'Attribute', 'Cut', 'Answer'])
 # calculate Abs Lift
 df.loc[:, 'Abs_Lift'] = df.loc[:,'Conv_Exp'] - df.loc[:, 'Conv_Con']
@@ -65,7 +65,7 @@ lookup_values.append(lookup_df.columns.to_list())
 for row in lookup_df.values.tolist():
     lookup_values.append(row)
     
-sheetManager.update_values(sheetId=sheetId,
+sheetManager.update_values(spreadsheetId=spreadsheetId,
                            update_range=lookup_range,
                            values=lookup_values)
 
@@ -158,6 +158,34 @@ for row in cuts_list:
 #    for row in values:
 #        writer.writerow(row)
 
-sheetManager.update_values(sheetId=sheetId,
+sheetManager.update_values(spreadsheetId=spreadsheetId,
                            update_range=results_range,
                            values=values)
+
+# get info about the spreadsheet
+# we need the sheet id of our created sheet so we can format it
+spreadsheet_info = sheetManager.get(spreadsheetId=spreadsheetId)
+sheet_info = spreadsheet_info['sheets']
+for sheet in sheet_info:
+    if sheet['properties']['title'] == results_range:
+        sheet_id = sheet['properties']['sheetId']
+
+# create a bunch of api requests for formatting
+
+#requests = []
+#
+#requests.append({
+#        'updateBorders': {
+#                'range': {
+#                        'sheetId': sheetId
+#                        },
+#                'bottom': 'BLUE'
+#                }
+#        })
+#
+#body = {
+#        'requests': requests
+#        }
+#    
+#sheetManager.batch_update(sheetId=sheetId,
+#                          body = body)
