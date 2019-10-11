@@ -65,9 +65,9 @@ lookup_values.append(lookup_df.columns.to_list())
 for row in lookup_df.values.tolist():
     lookup_values.append(row)
     
-#sheetManager.update_values(sheetId=sheetId,
-#                           update_range=lookup_range,
-#                           values=lookup_values)
+sheetManager.update_values(sheetId=sheetId,
+                           update_range=lookup_range,
+                           values=lookup_values)
 
 # now we start building the list of lists for our magic template tab
 values = []
@@ -115,7 +115,8 @@ for cell in range(len_of_array_formula_row):
     array_formula_row.append('=concatenate("Placeholder for array formula. Attribute is: ", ADDRESS(ROW(),1, 3))')
     
 #values.append(array_formula_row)
-    
+
+baseline_col = lookup_df.columns.get_loc('Conv_Con') + 1    
 summary_col = lookup_df.columns.get_loc('Summary') + 1
 #results_formula = '=vlookup(concatenate(index(indirect(address(row(), 1, 3, TRUE))),"|",index(indirect(address(row(), 2, 3, TRUE))),"|",index(indirect(address(1,column(),2,TRUE))),"|",index(indirect(address(2,column(),2,TRUE)))), ScrutineerLookup!A:Z, '+str(summary_col)+', false)'
 results_formula = '=CONCATENATE(INDIRECT(ADDRESS(ROW()-2,1,1,1)),"|",INDIRECT(ADDRESS(ROW()-2,2,1,1)),"|",INDIRECT(ADDRESS(1,COLUMN(),1,1)),"|",INDIRECT(ADDRESS(2,COLUMN(),1,1)))'
@@ -123,6 +124,7 @@ results_formula = '=CONCATENATE(INDIRECT(ADDRESS(ROW()-2,1,1,1)),"|",INDIRECT(AD
 # each attribute/cut pair will have the same sample size throughout all the qns and ans
 # so we just need to get the first one
 sample_size_formula = 'Sample Size Placeholder'
+baselines_formula = '=vlookup(CONCATENATE(INDIRECT(ADDRESS(ROW()-1,1,1,1)),"|",INDIRECT(ADDRESS(ROW()-1,2,1,1)),"|",INDIRECT(ADDRESS(1,COLUMN(),1,1)),"|",INDIRECT(ADDRESS(2,COLUMN(),1,1))),ScrutineerLookup!A:Z,'+str(baseline_col)+',false)'
 
 # MAIN BODY
 # get all the possible attribute/cut combinations
@@ -142,7 +144,7 @@ for row in cuts_list:
     # create a row for the baselines
     baselines = ['', 'Baseline']
     for x in range(len_to_write):
-        baselines.append('Baseline Placeholder')
+        baselines.append(baselines_formula)
     values.append(baselines)
     # create a row for the results, with sample size in front
     results = ['Sample Size:', sample_size_formula]
@@ -150,12 +152,12 @@ for row in cuts_list:
         results.append(results_formula)
     values.append(results)
 
-import csv
-with open('test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
-    writer = csv.writer(csvfile)
-    for row in values:
-        writer.writerow(row)
+#import csv
+#with open('test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+#    writer = csv.writer(csvfile)
+#    for row in values:
+#        writer.writerow(row)
 
-#sheetManager.update_values(sheetId=sheetId,
-#                           update_range=results_range,
-#                           values=values)
+sheetManager.update_values(sheetId=sheetId,
+                           update_range=results_range,
+                           values=values)
