@@ -5,9 +5,12 @@ Created on Tue Sep 24 16:03:31 2019
 @author: charles.tan
 """
 
-sheetId = '1rlc8Wltr15SCLie4QrbiZjNQXSkD7l19dbBixdhTuCg'
 
-data_range = 'Results'
+sheetId = '1bmwUdvFVHzUzyDco00caFwQms4D38blCBMFNA5eWWo0'
+data_range = 'results-20191108-140819.csv'
+
+#sheetId = '1rlc8Wltr15SCLie4QrbiZjNQXSkD7l19dbBixdhTuCg'
+#data_range = 'Results'
 lookup_range = 'ScrutineerLookup'
 results_range = 'Results2'
 #sheetId = '1SohobNnQDLN1T95Wl3jMD0QEgV7VgPlX-3pZH43rcE4'
@@ -121,6 +124,12 @@ for row in cuts[['Attribute', 'Cut']].values.tolist():
     values.append(pair)
 
 
-sheetManager.update_values(sheetId=sheetId,
-                           update_range=results_range,
-                           values=values)
+#sheetManager.update_values(sheetId=sheetId,
+#                           update_range=results_range,
+#                           values=values)
+    
+import csv
+with open('results.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    for row in values:
+        writer.writerow(row)
