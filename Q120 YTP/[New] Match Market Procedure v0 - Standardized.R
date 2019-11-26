@@ -131,7 +131,7 @@ MatchScores2 <- merge(mm$BestMatches, newdf, by="CountryID")
 head(MatchScores2)
 colnames(MatchScores2)
 
-#write.csv(MatchScores2,"YTPJPQ319_MatchScores.csv")
+#write.csv(MatchScores2,"YTPJPQ120_MatchScores.csv")
 
 MatchScores3<-MatchScores2[MatchScores2$corr_tag_90==1 & MatchScores2$pop_ave_corr_more==1 & MatchScores2$pop_ave_dtw_topP==1,]
 head(MatchScores3)
