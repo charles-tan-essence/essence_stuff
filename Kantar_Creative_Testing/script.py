@@ -49,5 +49,6 @@ for group in groups:
         table[group + ' 90% sig'] = table[group + ' 90% sig'].mask(table[group + ' p-value'] < .1, 'Significant Lift')
         table[group + ' 95% sig'] = 'No Lift'
         table[group + ' 95% sig'] = table[group + ' 95% sig'].mask(table[group + ' p-value'] < .05, 'Strong Significant Lift')
+        table[group + ' abs lift'] = (table[group]/table[group + ' base']) - (table['4. Control']/table['4. Control base'])
 
 table.to_csv('result.csv')
