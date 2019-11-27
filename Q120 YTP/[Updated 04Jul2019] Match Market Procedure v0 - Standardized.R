@@ -59,6 +59,7 @@ for (lib in libs) {
 #library(GeoexperimentsResearch)
 
 data_raw = read.csv('signups.csv', header=T, encoding='UTF-8')
+#data_raw = read.csv('signups_agg_control.csv', header=T, encoding='UTF-8')
 colnames(data_raw)[1] <- 'Day'
 print(head(data_raw))
 
@@ -93,3 +94,4 @@ head(mm)
 mm <- mm[order(mm$Region, mm$rank),]
 head(mm)
 write.csv(mm, 'MM_results.csv', row.names=FALSE)
+#write.csv(mm, 'MM_results_agg_control.csv', row.names=FALSE)
