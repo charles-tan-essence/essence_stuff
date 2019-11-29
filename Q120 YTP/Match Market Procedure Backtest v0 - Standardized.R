@@ -70,14 +70,11 @@ for (lib in libs) {
 ############################################
 
 ###user input
-test_period = c("2019-03-01","2019-05-01","2019-05-31")
-geoassign<-data.frame("geo"=c('Osaka Prefecture', 'Kanagawa Prefecture', 'Tokyo', 'Saitama Prefecture', 'Hyogo Prefecture',
-                              'Shizuoka Prefecture', 'Kyoto Prefecture', 'Ibaraki Prefecture', 'Hiroshima Prefecture',
-                              'Miyagi Prefecture', 'Tochigi Prefecture', 'Niigata Prefecture', 'Gunma Prefecture', 'Nagano Prefecture',
-                              'Fukushima Prefecture', 'Gifu Prefecture', 'Okinawa Prefecture', 'Okayama Prefecture', 'Mie Prefecture',
-                              'Kumamoto Prefecture', 'Shiga Prefecture',
-                              'Aichi Prefecture', 'Chiba Prefecture', 'Fukuoka Prefecture', 'Hokkaido Prefecture'),
-                      "geo.group"=c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2)) #set exposed and control markets
+test_period = c("2018-12-01","2019-04-01","2019-05-31")
+geoassign<-data.frame("geo"=c('Tokyo', 'Kanagawa Prefecture', 'Osaka Prefecture', 'Saitama Prefecture', 
+                              'Miyagi Prefecture', 'Ibaraki Prefecture', 'Hokkaido Prefecture', 'Kyoto Prefecture',
+                              'Hiroshima Prefecture', 'Fukuoka Prefecture', 'Chiba Prefecture', 'Shizuoka Prefecture'),
+                      "geo.group"=c(1,1,1,1,2,2,2,2,2,2,2,2)) #set exposed and control markets
 
 ###
 
