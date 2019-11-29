@@ -71,10 +71,11 @@ for (lib in libs) {
 
 ###user input
 test_period = c("2018-12-01","2019-04-01","2019-05-31")
-geoassign<-data.frame("geo"=c('Tokyo', 'Kanagawa Prefecture', 'Osaka Prefecture', 'Saitama Prefecture', 
-                              'Miyagi Prefecture', 'Ibaraki Prefecture', 'Hokkaido Prefecture', 'Kyoto Prefecture',
-                              'Hiroshima Prefecture', 'Fukuoka Prefecture', 'Chiba Prefecture', 'Shizuoka Prefecture'),
-                      "geo.group"=c(1,1,1,1,2,2,2,2,2,2,2,2)) #set exposed and control markets
+geoassign<-data.frame("geo"=c('Tokyo', 'Kanagawa Prefecture', 'Osaka Prefecture', 
+                              'Miyagi Prefecture', 'Ibaraki Prefecture', 'Hokkaido Prefecture', 'Shizuoka Prefecture',
+                              'Chiba Prefecture', 'Hiroshima Prefecture', 'Kyoto Prefecture', 'Fukuoka Prefecture',
+                              'Saitama Prefecture'),
+                      "geo.group"=c(1,1,1,2,2,2,2,2,2,2,2,2)) #set exposed and control markets
 
 ###
 
