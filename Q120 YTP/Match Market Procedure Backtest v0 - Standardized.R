@@ -76,6 +76,7 @@ geoassign<-data.frame("geo"=c('Tokyo', 'Kanagawa Prefecture', 'Osaka Prefecture'
                               'Chiba Prefecture', 'Hiroshima Prefecture', 'Kyoto Prefecture', 'Fukuoka Prefecture',
                               'Saitama Prefecture'),
                       "geo.group"=c(1,1,1,2,3,4,5,6,7,8,9,10)) #set exposed and control markets
+#                      "geo.group"=c(1,1,1,2,2,2,2,2,2,2,2,2)) #set exposed and control markets
 
 ###
 
@@ -122,7 +123,7 @@ pre.period <- as.Date(c(test_period[1],toString(as.Date(test_period[2])-1)))
 pre.period
 post.period <- as.Date(c(test_period[2],test_period[3]))
 post.period
-time.points <- seq.Date(as.Date(test_period[1]), by = 1, length.out = nrow(obj_ci)/2)
+time.points <- seq.Date(as.Date(test_period[1]), to=as.Date(test_period[3]), by = 1)
 max(time.points)
 ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
                      obj_ci[obj_ci$geo.group==2,]$Signups,
@@ -134,11 +135,12 @@ ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
                      obj_ci[obj_ci$geo.group==8,]$Signups,
                      obj_ci[obj_ci$geo.group==9,]$Signups,
                      obj_ci[obj_ci$geo.group==10,]$Signups), time.points)
+"ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
+                     obj_ci[obj_ci$geo.group==2,]$Signups), time.points)"
 ci_data
-print(ci_data)
 impact <- CausalImpact(ci_data, pre.period, post.period, alpha=0.05, model.args=list(niter=5000))
 plot(impact)
-summary(impact)
+summary(impact, "report")
 ggplot(data=obj_ci,aes(x=date,y=Signups,group=as.factor(geo.group), colour=as.factor(geo.group)))+
   geom_line()+
   geom_point()
