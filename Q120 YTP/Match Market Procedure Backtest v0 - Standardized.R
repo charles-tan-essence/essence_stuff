@@ -119,7 +119,9 @@ plot(obj.tbr)
 obj_ci<-aggregate(obj,by=c('date','geo.group'))
 obj_ci
 pre.period <- as.Date(c(test_period[1],toString(as.Date(test_period[2])-1)))
+pre.period
 post.period <- as.Date(c(test_period[2],test_period[3]))
+post.period
 time.points <- seq.Date(as.Date(test_period[1]), by = 1, length.out = nrow(obj_ci)/2)
 max(time.points)
 ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
@@ -133,7 +135,8 @@ ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
                      obj_ci[obj_ci$geo.group==9,]$Signups,
                      obj_ci[obj_ci$geo.group==10,]$Signups), time.points)
 ci_data
-impact <- CausalImpact(ci_data, pre.period, post.period, alpha=0.05, model.args=list(niter=5000, nseasons=7))
+print(ci_data)
+impact <- CausalImpact(ci_data, pre.period, post.period, alpha=0.05, model.args=list(niter=5000))
 plot(impact)
 summary(impact)
 ggplot(data=obj_ci,aes(x=date,y=Signups,group=as.factor(geo.group), colour=as.factor(geo.group)))+
