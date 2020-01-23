@@ -135,12 +135,13 @@ ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
                      obj_ci[obj_ci$geo.group==8,]$Signups,
                      obj_ci[obj_ci$geo.group==9,]$Signups,
                      obj_ci[obj_ci$geo.group==10,]$Signups), time.points)
-"ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
-                     obj_ci[obj_ci$geo.group==2,]$Signups), time.points)"
+'ci_data <- zoo(cbind(obj_ci[obj_ci$geo.group==1,]$Signups,
+                     obj_ci[obj_ci$geo.group==2,]$Signups), time.points)'
 ci_data
 impact <- CausalImpact(ci_data, pre.period, post.period, alpha=0.05, model.args=list(niter=5000))
 plot(impact)
 summary(impact, "report")
+plot(impact$model$bsts.model, "coefficients")
 ggplot(data=obj_ci,aes(x=date,y=Signups,group=as.factor(geo.group), colour=as.factor(geo.group)))+
   geom_line()+
   geom_point()
