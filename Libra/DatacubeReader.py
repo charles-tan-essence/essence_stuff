@@ -13,6 +13,8 @@ from sheets.sheetmanager import SheetManager
 keys = 'credentials.json'
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
+folder_id = '1Eri3yVNP1zOWkz9xxFOPRlmOtKurvJ-Y'
+
 authenticator = Authenticator(keys)
 creds = authenticator.get_creds(SCOPES)
 manager = SheetManager(creds)
@@ -20,7 +22,7 @@ manager = SheetManager(creds)
 resource = build('drive', 'v3', credentials=creds).files()
 
 request = resource.list(corpora='user',
-                        q="'1Eri3yVNP1zOWkz9xxFOPRlmOtKurvJ-Y' in parents")
+                        q="'"+folder_id+"' in parents")
 
 response = request.execute()
 
